@@ -1,0 +1,455 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>STL Cardinals GM Simulator 2036</title>
+<style>
+:root{
+  --red:#b71c32;--red2:#8d1024;--navy:#17263d;--bg:#f2f4f7;--panel:#fff;
+  --line:#d9dee7;--muted:#6c7585;--text:#18202c;--gold:#d9a62e;
+  --shadow:0 8px 24px rgba(20,30,44,.10)
+}
+*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(#e9edf2,#f7f8fa 360px);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif}
+header{background:linear-gradient(135deg,var(--red2),var(--red));color:#fff;padding:20px 16px 62px;border-bottom:5px solid #e6ba43}
+.head{max-width:1220px;margin:auto}.eyebrow{font-size:11px;letter-spacing:.16em;font-weight:800;opacity:.8}
+h1{margin:4px 0 0;font-size:clamp(28px,5vw,45px)}.sub{font-size:12px;color:var(--muted)}
+.wrap{max-width:1220px;margin:-42px auto 38px;padding:0 12px}
+.metrics{display:grid;grid-template-columns:repeat(5,1fr);gap:9px}
+.metric,.panel{background:var(--panel);border:1px solid var(--line);box-shadow:var(--shadow);border-radius:16px}
+.metric{padding:13px}.metric small{display:block;font-size:10px;color:var(--muted);font-weight:900}.metric strong{display:block;font-size:21px;margin-top:3px}.metric span{font-size:10px;color:var(--muted)}
+.nav{display:flex;gap:7px;flex-wrap:wrap;margin:14px 0}
+.nav button{border:1px solid var(--line);background:#fff;color:var(--navy);border-radius:999px;padding:9px 13px;font-weight:900}
+.nav button.active{background:var(--navy);color:#fff}
+.panel{overflow:hidden}.panel+.panel{margin-top:13px}.phead{padding:14px 15px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:10px}.phead h2{margin:0;font-size:17px}.body{padding:14px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+button{font:inherit;cursor:pointer}.btn{border:0;border-radius:11px;min-height:44px;padding:0 14px;font-weight:900}.primary{background:var(--red);color:#fff}.secondary{background:var(--navy);color:#fff}.ghost{background:#edf0f4;color:var(--navy)}.danger{background:#8f1024;color:#fff}.btn:disabled{opacity:.45;cursor:not-allowed}
+.actions{display:flex;gap:8px;flex-wrap:wrap}.notice{background:#fff8e7;border:1px solid #ead18b;border-radius:12px;padding:10px 12px;font-size:12px;line-height:1.55;color:#665117}
+.result{background:#f7f8fa;border:1px solid var(--line);border-radius:14px;padding:14px}.big{font-size:42px;font-weight:950;color:var(--red);line-height:1}
+.awards{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}.award{font-size:11px;font-weight:900;background:#fff3c8;border:1px solid #e2c46d;padding:6px 9px;border-radius:999px}
+.tablewrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:880px}th,td{padding:9px;border-bottom:1px solid var(--line);text-align:left;font-size:12px;white-space:nowrap}th{font-size:10px;color:var(--muted);background:#fafbfc}
+.name{font-weight:950;font-size:14px}.abilityline{font-size:11px;color:#4a5567;margin-top:3px;white-space:normal;line-height:1.45}
+.grade{font-weight:950}.gS{color:#7038ba}.gA{color:#d82c3a}.gB{color:#df7a1b}.gC{color:#b58a00}.gD{color:#2b8a4b}.gE{color:#2775a7}.gF{color:#66788d}.gG{color:#6f7379}
+.market{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.card{border:1px solid var(--line);border-radius:14px;padding:13px;background:#fbfcfd}.card.npb{background:#fffaf0;border-color:#e4bd58}.tag{font-size:10px;font-weight:950;padding:4px 7px;border-radius:999px;background:#e9edf2;color:#485466}.tag.npb{background:#f7dfa0;color:#6a4a00}.markettop{display:flex;justify-content:space-between;gap:10px}.market h3{margin:5px 0 0;font-size:16px}.contract{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);display:flex;align-items:flex-end;justify-content:space-between;gap:10px}.contract strong{font-size:14px}.scout{font-size:10px;color:var(--muted);margin-top:7px}
+.log{display:flex;flex-direction:column;gap:6px}.logitem{background:#fafbfc;border-left:3px solid var(--line);padding:7px 9px;font-size:12px}
+.hidden{display:none!important}
+@media(max-width:900px){.metrics{grid-template-columns:repeat(2,1fr)}.grid2{grid-template-columns:1fr}.market{grid-template-columns:1fr}}
+@media(max-width:520px){header{padding-bottom:58px}.metric strong{font-size:17px}.market{grid-template-columns:1fr}.actions{flex-direction:column}.actions .btn{width:100%}}
+</style>
+</head>
+<body>
+<header>
+  <div class="head">
+    <div class="eyebrow">MLB FRONT OFFICE SIMULATOR</div>
+    <h1>St. Louis Cardinals</h1>
+    <div style="margin-top:4px;font-size:12px;opacity:.82">2036年開始 / 完全架空ロスター</div>
+  </div>
+</header>
+
+<div class="wrap">
+  <section class="metrics">
+    <div class="metric"><small>SEASON</small><strong id="season">2036</strong><span id="phaseText">プレシーズン</span></div>
+    <div class="metric"><small>FANS</small><strong id="fans">2.42M</strong><span id="fanDelta">昨年比 —</span></div>
+    <div class="metric"><small>BUDGET</small><strong id="budget">$178M</strong><span>人気・成績で変動</span></div>
+    <div class="metric"><small>PAYROLL</small><strong id="payroll">$139M</strong><span id="space">残り $39M</span></div>
+    <div class="metric"><small>RECORD</small><strong id="record">0-0</strong><span id="division">NL Central —</span></div>
+  </section>
+
+  <nav class="nav">
+    <button class="active" data-tab="club">球団</button>
+    <button data-tab="roster">ロスター</button>
+    <button data-tab="market">FA / ポスティング</button>
+    <button data-tab="history">履歴</button>
+  </nav>
+
+  <section id="clubTab" class="tab">
+    <div class="grid2">
+      <div class="panel">
+        <div class="phead"><div><h2>シーズン運営</h2><div class="sub">162試合を一括進行</div></div></div>
+        <div class="body">
+          <div id="seasonResult" class="result"></div>
+          <div class="actions" style="margin-top:11px">
+            <button id="simBtn" class="btn primary">2036年シーズンを進める</button>
+            <button id="offBtn" class="btn secondary hidden">オフシーズンへ</button>
+            <button id="nextBtn" class="btn secondary hidden">翌シーズンへ</button>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="phead"><div><h2>経営ルール</h2><div class="sub">ファン数 → 翌年度予算</div></div></div>
+        <div class="body">
+          <div class="notice">地区順位、ポストシーズン進出、World Series、MVP、Cy Young、Silver Sluggerなどでファン数が変動。そのファン数から翌年の球団予算を算出します。</div>
+          <div style="margin-top:11px;font-size:12px;line-height:1.7">
+            <b>現在戦力：</b><span id="teamStrength">—</span><br>
+            <b>26人枠：</b><span id="count26">26/26</span><br>
+            <b>残り予算：</b><span id="roomText">—</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="phead"><div><h2>球団ニュース</h2><div class="sub">直近イベント</div></div></div>
+      <div class="body"><div id="log" class="log"></div></div>
+    </div>
+  </section>
+
+  <section id="rosterTab" class="tab hidden">
+    <div class="panel">
+      <div class="phead"><div><h2>ロスター</h2><div class="sub">名前の下に全能力を表示</div></div><div class="sub" id="rosterCount"></div></div>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>選手</th><th>Pos</th><th>年齢</th><th>年俸</th><th>OVR</th><th></th></tr></thead>
+          <tbody id="rosterBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section id="marketTab" class="tab hidden">
+    <div class="panel">
+      <div class="phead">
+        <div><h2>FA / ポスティング市場</h2><div class="sub">低確率でNPB選手が出現</div></div>
+        <button id="refreshBtn" class="btn ghost">市場を更新</button>
+      </div>
+      <div class="body">
+        <div id="marketLocked" class="notice">シーズン終了後にオフシーズンへ進むと市場が開きます。</div>
+        <div id="marketOpen" class="hidden">
+          <div class="notice" style="margin-bottom:11px">市場で見える能力はスカウト推定。各能力は実能力から<strong>0〜20</strong>ズレる可能性があります。契約後、ロスターで実能力が判明します。</div>
+          <div id="marketList" class="market"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="historyTab" class="tab hidden">
+    <div class="panel">
+      <div class="phead"><div><h2>フランチャイズ履歴</h2><div class="sub">2036年以降</div></div></div>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>年</th><th>勝敗</th><th>地区順位</th><th>ポストシーズン</th><th>タイトル</th><th>ファン</th><th>翌年予算</th></tr></thead>
+          <tbody id="historyBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+function el(id){ return document.getElementById(id); }
+function rand(a,b){ return a+Math.random()*(b-a); }
+function ri(a,b){ return Math.floor(rand(a,b+1)); }
+function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+function clamp(v,a,b){ return Math.max(a,Math.min(b,Math.round(v))); }
+function uid(){ return "p_"+Date.now().toString(36)+"_"+Math.random().toString(36).slice(2,9); }
+function avg(a){ return a.length?a.reduce(function(s,x){return s+x;},0)/a.length:0; }
+function money(n){ return "$"+Number(n).toFixed(1).replace(".0","")+"M"; }
+
+var FIRST=["Ethan","Noah","Caleb","Mason","Luke","Owen","Julian","Miles","Logan","Carter","Wyatt","Isaac","Adrian","Theo","Nolan","Micah","Grant","Cole","Drew","Max","Ryan","Eli","Jonah","Leo"];
+var LAST=["Mercer","Hayes","Bennett","Carver","Ramsey","Fletcher","Dawson","Sutton","Holloway","Reed","Keller","Bishop","Dalton","Maddox","Walsh","Parker","Harlan","Vaughn","Crawford","Ellis","Brooks","Turner","Moran"];
+var JPFIRST=["ハヤト","ユウマ","レン","ソウタ","アオイ","ミナト","ヤマト","カイト","レオ","タクマ","シュン","ケイ","ナオキ","イオリ"];
+var JPLAST=["ダテ","サエキ","タカハシ","フジワラ","クロダ","マエダ","カミヤ","シライシ","タチバナ","キリュウ","ミズノ","ナルセ","オオノ","ニシカワ"];
+var POS=["C","1B","2B","3B","SS","LF","CF","RF","DH","SP","SP","SP","SP","RP","RP","RP","CL"];
+
+var state={
+  year:2036, phase:"preseason", fans:2.42, fanDelta:0, budget:178,
+  record:{w:0,l:0,rank:null}, postseason:"—", titles:[],
+  roster:[], market:[], history:[],
+  log:["2036: セントルイス・カージナルス新フロント発足。","完全架空ロスターで2036年シーズンを開始。"]
+};
+
+function grade(v){
+  if(v>=90)return "S"; if(v>=80)return "A"; if(v>=70)return "B";
+  if(v>=60)return "C"; if(v>=50)return "D"; if(v>=40)return "E";
+  if(v>=30)return "F"; return "G";
+}
+function gspan(v,label){
+  var g=grade(v);
+  return '<span class="grade g'+g+'">'+label+g+v+'</span>';
+}
+function ovr(p){
+  return Math.round(p.meet*.22+p.power*.23+p.run*.15+p.arm*.13+p.field*.18+p.catch*.09);
+}
+function abilityLine(p, scout){
+  var x=scout||p;
+  return [
+    gspan(x.meet,"ミート"),
+    gspan(x.power,"パワー"),
+    gspan(x.run,"走力"),
+    gspan(x.arm,"肩力"),
+    gspan(x.field,"守備力"),
+    gspan(x.catch,"捕球")
+  ].join("　");
+}
+function payroll(){
+  return state.roster.reduce(function(s,p){return s+p.salary;},0);
+}
+function room(){
+  return state.budget-payroll();
+}
+function makeName(jp){
+  return jp ? pick(JPLAST)+" "+pick(JPFIRST) : pick(FIRST)+" "+pick(LAST);
+}
+function makePlayer(pos,index,jp){
+  var age=jp?ri(24,31):ri(22,34);
+  var base=ri(48,78)+(Math.random()<.12?ri(8,15):0);
+  var p={
+    id:uid(), name:makeName(!!jp), origin:jp?"NPB":"MLB", pos:pos, age:age,
+    meet:clamp(base+ri(-14,14),20,99),
+    power:clamp(base+ri(-14,14),20,99),
+    run:clamp(base+ri(-18,16),20,99),
+    arm:clamp(base+ri(-14,15),20,99),
+    field:clamp(base+ri(-14,14),20,99),
+    catch:clamp(base+ri(-14,14),20,99),
+    salary:0, years:ri(1,6)
+  };
+  if(pos==="SP"||pos==="RP"||pos==="CL"){
+    p.meet=clamp(base-25+ri(-8,7),20,80);
+    p.power=clamp(base-20+ri(-8,8),20,85);
+    p.run=clamp(base-18+ri(-9,7),20,85);
+    p.arm=clamp(base+ri(4,18),35,99);
+    p.field=clamp(base+ri(-10,10),25,95);
+    p.catch=clamp(base+ri(-10,10),25,95);
+  }
+  p.salary=Math.max(.8, +((ovr(p)-35)*.38+rand(-2,4)).toFixed(1));
+  if(index<3)p.salary+=ri(5,11);
+  return p;
+}
+function buildRoster(){
+  var r=[];
+  POS.forEach(function(pos,i){ r.push(makePlayer(pos,i,false)); });
+  ["C","2B","SS","3B","CF","RF","RP","RP","SP"].forEach(function(pos,i){
+    r.push(makePlayer(pos,20+i,false));
+  });
+  state.roster=r.slice(0,26);
+  var scale=139/payroll();
+  state.roster.forEach(function(p){ p.salary=+Math.max(.8,p.salary*scale).toFixed(1); });
+}
+buildRoster();
+
+function scoutOne(v){
+  if(Math.random()<.26)return v;
+  var d=ri(1,20);
+  return clamp(v+(Math.random()<.5?-d:d),20,99);
+}
+function makeMarketPlayer(){
+  var isNPB=Math.random()<.13;
+  var posting=isNPB && Math.random()<.62;
+  var pos=pick(["C","1B","2B","3B","SS","LF","CF","RF","SP","SP","RP","CL"]);
+  var p=makePlayer(pos,40,isNPB);
+  p.origin=isNPB?(posting?"NPB ポスティング":"NPB FA"):"MLB FA";
+  p.salary=+Math.max(1.3,((ovr(p)-35)*.42+rand(-2,5))*(isNPB?.86:1)).toFixed(1);
+  p.postingFee=posting?+Math.max(4,(ovr(p)-50)*.25+rand(2,8)).toFixed(1):0;
+  p.scout={
+    meet:scoutOne(p.meet), power:scoutOne(p.power), run:scoutOne(p.run),
+    arm:scoutOne(p.arm), field:scoutOne(p.field), catch:scoutOne(p.catch)
+  };
+  return p;
+}
+function generateMarket(){
+  state.market=[];
+  var n=ri(10,14);
+  for(var i=0;i<n;i++)state.market.push(makeMarketPlayer());
+}
+
+function teamStrength(){
+  var all=state.roster.slice().sort(function(a,b){return ovr(b)-ovr(a);}).slice(0,18);
+  return avg(all.map(ovr));
+}
+function titles(wins){
+  var t=[];
+  var bats=state.roster.filter(function(p){return ["C","1B","2B","3B","SS","LF","CF","RF","DH"].indexOf(p.pos)>=0;}).sort(function(a,b){return ovr(b)-ovr(a);});
+  var pits=state.roster.filter(function(p){return ["SP","RP","CL"].indexOf(p.pos)>=0;}).sort(function(a,b){return ovr(b)-ovr(a);});
+  if(bats[0] && Math.random()<Math.max(.06,(ovr(bats[0])-70)*.025)) t.push(bats[0].name+" — Silver Slugger");
+  if(bats[0] && Math.random()<Math.max(.02,(ovr(bats[0])-80)*.02)) t.push(bats[0].name+" — NL MVP");
+  if(pits[0] && Math.random()<Math.max(.03,(ovr(pits[0])-78)*.022)) t.push(pits[0].name+" — Cy Young");
+  if(wins>=95 && Math.random()<.22)t.push("Manager of the Year");
+  return t;
+}
+function fanChange(rank,wins,post,t){
+  var d={1:.18,2:.07,3:-.02,4:-.09,5:-.16}[rank]||0;
+  if(wins>=100)d+=.08; else if(wins>=90)d+=.04; else if(wins<70)d-=.08;
+  if(post==="Wild Card")d+=.03;
+  if(post==="Division Series")d+=.06;
+  if(post==="Championship Series")d+=.10;
+  if(post==="NL Champion")d+=.16;
+  if(post==="World Series Champion")d+=.30;
+  d+=t.length*.035+rand(-.025,.025);
+  return +d.toFixed(2);
+}
+function budgetFromFans(){ return Math.round(72+state.fans*42); }
+
+function simulateSeason(){
+  if(state.phase!=="preseason")return;
+  var s=teamStrength();
+  var exp=66+(s-55)*.55;
+  var wins=clamp(exp+rand(-10,10),55,108);
+  var losses=162-wins, rank;
+  if(wins>=94)rank=Math.random()<.78?1:2;
+  else if(wins>=86)rank=Math.random()<.55?2:3;
+  else if(wins>=78)rank=Math.random()<.60?3:4;
+  else rank=Math.random()<.55?4:5;
+
+  var post="Missed Postseason";
+  var made=rank===1||wins>=86||(wins>=82&&Math.random()<.35);
+  if(made){
+    var x=Math.random();
+    if(x<.42)post="Wild Card";
+    else if(x<.67)post="Division Series";
+    else if(x<.82)post="Championship Series";
+    else if(x<.92)post="NL Champion";
+    else post="World Series Champion";
+  }
+
+  var t=titles(wins);
+  var delta=fanChange(rank,wins,post,t);
+  state.record={w:wins,l:losses,rank:rank};
+  state.postseason=post; state.titles=t; state.fanDelta=delta;
+  state.fans=Math.max(1.05,Math.min(4.2,+(state.fans+delta).toFixed(2)));
+  state.budget=budgetFromFans();
+  state.phase="completed";
+  state.history.push({year:state.year,w:wins,l:losses,rank:rank,post:post,titles:t.slice(),fans:state.fans,budget:state.budget});
+  state.log.unshift(state.year+": "+wins+"勝"+losses+"敗、NL Central "+rank+"位。"+post+"。");
+  if(t.length)state.log.unshift(state.year+": "+t.join(" / "));
+  state.log.unshift(state.year+": ファン "+(delta>=0?"+":"")+delta.toFixed(2)+"M。翌年度予算 "+money(state.budget)+"。");
+  render();
+}
+function enterOffseason(){
+  if(state.phase!=="completed")return;
+  state.phase="offseason";
+  generateMarket();
+  state.log.unshift(state.year+" オフ: FA / ポスティング市場が開幕。");
+  render(); switchTab("market");
+}
+function nextSeason(){
+  if(state.phase!=="offseason")return;
+  state.year++;
+  state.phase="preseason"; state.record={w:0,l:0,rank:null}; state.postseason="—"; state.titles=[]; state.market=[]; state.fanDelta=0;
+  state.roster.forEach(function(p){
+    p.age++;
+    p.years=Math.max(0,p.years-1);
+    var mod=p.age<=27?ri(-1,3):(p.age>=33?ri(-3,0):ri(-1,1));
+    ["meet","power","run","arm","field","catch"].forEach(function(k){p[k]=clamp(p[k]+mod,20,99);});
+  });
+  state.log.unshift(state.year+": 新シーズン開幕。");
+  render(); switchTab("club");
+}
+function signPlayer(id){
+  if(state.phase!=="offseason")return;
+  var p=state.market.find(function(x){return x.id===id;});
+  if(!p)return;
+  if(state.roster.length>=26){ window.alert("26人枠が埋まっています。先に選手を放出してください。"); return; }
+  var cost=p.salary+p.postingFee;
+  if(room()<cost){ window.alert("予算不足です。初年度必要額 "+money(cost)+" / 残り "+money(Math.max(0,room()))); return; }
+  var signed={
+    id:p.id,name:p.name,origin:p.origin,pos:p.pos,age:p.age,
+    meet:p.meet,power:p.power,run:p.run,arm:p.arm,field:p.field,catch:p.catch,
+    salary:p.salary,years:p.years,postingFee:p.postingFee
+  };
+  state.roster.push(signed);
+  state.market=state.market.filter(function(x){return x.id!==id;});
+  state.log.unshift(state.year+" オフ: "+p.name+"（"+p.origin+"）を獲得。契約後に実能力が判明。");
+  render();
+}
+function releasePlayer(id){
+  var p=state.roster.find(function(x){return x.id===id;});
+  if(!p)return;
+  state.roster=state.roster.filter(function(x){return x.id!==id;});
+  state.log.unshift(state.year+": "+p.name+"をロスターから放出。");
+  render();
+}
+
+function renderMetrics(){
+  el("season").textContent=state.year;
+  el("phaseText").textContent=state.phase==="preseason"?"プレシーズン":state.phase==="completed"?"シーズン終了":"オフシーズン";
+  el("fans").textContent=state.fans.toFixed(2)+"M";
+  el("fanDelta").textContent=state.fanDelta===0?"昨年比 —":"直近 "+(state.fanDelta>=0?"+":"")+state.fanDelta.toFixed(2)+"M";
+  el("budget").textContent=money(state.budget);
+  el("payroll").textContent=money(payroll());
+  el("space").textContent="残り "+money(Math.max(0,room()));
+  el("record").textContent=state.record.w+"-"+state.record.l;
+  el("division").textContent=state.record.rank?"NL Central "+state.record.rank+"位":"NL Central —";
+  el("teamStrength").textContent=teamStrength().toFixed(1)+" / 100";
+  el("count26").textContent=state.roster.length+"/26";
+  el("roomText").textContent=money(room());
+}
+function renderClub(){
+  var box=el("seasonResult");
+  if(state.phase==="preseason"){
+    box.innerHTML='<div class="sub">'+state.year+' PRESEASON</div><div style="font-size:21px;font-weight:950;margin-top:4px">開幕前</div><div class="sub" style="margin-top:7px">チーム戦力 '+teamStrength().toFixed(1)+' / 100　給与総額 '+money(payroll())+'</div>';
+  }else{
+    var h=state.history[state.history.length-1];
+    box.innerHTML='<div class="sub">'+h.year+' SEASON RESULT</div><div class="big">'+h.rank+'位</div><div style="font-size:17px;font-weight:950">'+h.w+'-'+h.l+' / '+h.post+'</div><div class="awards">'+(h.titles.length?h.titles.map(function(x){return '<span class="award">'+x+'</span>';}).join(""):'<span class="award">個人タイトルなし</span>')+'</div>';
+  }
+  el("simBtn").classList.toggle("hidden",state.phase!=="preseason");
+  el("offBtn").classList.toggle("hidden",state.phase!=="completed");
+  el("nextBtn").classList.toggle("hidden",state.phase!=="offseason");
+  el("simBtn").textContent=state.year+"年シーズンを進める";
+  el("log").innerHTML=state.log.slice(0,12).map(function(x){return '<div class="logitem">'+x+'</div>';}).join("");
+}
+function renderRoster(){
+  el("rosterCount").textContent=state.roster.length+"/26";
+  var body=el("rosterBody");
+  body.innerHTML=state.roster.slice().sort(function(a,b){return ovr(b)-ovr(a);}).map(function(p){
+    return '<tr>'+
+      '<td><div class="name">'+p.name+'</div><div class="abilityline">'+abilityLine(p)+'</div><div class="sub">'+p.origin+' / 契約残 '+p.years+'年</div></td>'+
+      '<td>'+p.pos+'</td><td>'+p.age+'</td><td>'+money(p.salary)+'</td><td><b>'+ovr(p)+'</b></td>'+
+      '<td><button class="btn danger" style="min-height:34px;padding:0 10px;font-size:11px" data-release="'+p.id+'">放出</button></td>'+
+    '</tr>';
+  }).join("");
+  Array.prototype.forEach.call(document.querySelectorAll("[data-release]"),function(b){
+    b.addEventListener("click",function(){releasePlayer(b.getAttribute("data-release"));});
+  });
+}
+function renderMarket(){
+  var open=state.phase==="offseason";
+  el("marketLocked").classList.toggle("hidden",open);
+  el("marketOpen").classList.toggle("hidden",!open);
+  el("refreshBtn").disabled=!open;
+  if(!open)return;
+  if(!state.market.length)generateMarket();
+  el("marketList").innerHTML=state.market.map(function(p){
+    var npb=p.origin.indexOf("NPB")===0;
+    return '<div class="card '+(npb?'npb':'')+'">'+
+      '<div class="markettop"><div><span class="tag '+(npb?'npb':'')+'">'+p.origin+'</span><h3>'+p.name+'</h3><div class="sub">'+p.pos+' / '+p.age+'歳</div></div><b>推定OVR '+ovr({meet:p.scout.meet,power:p.scout.power,run:p.scout.run,arm:p.scout.arm,field:p.scout.field,catch:p.scout.catch})+'</b></div>'+
+      '<div class="abilityline" style="margin-top:10px">'+abilityLine(p,p.scout)+'</div>'+
+      '<div class="scout">※ スカウト推定。各能力の誤差は0〜20。契約後に実能力を公開。</div>'+
+      '<div class="contract"><div><span class="sub">希望契約</span><br><strong>'+p.years+'年 × '+money(p.salary)+'</strong>'+(p.postingFee?'<div class="sub">+ Posting '+money(p.postingFee)+'</div>':'')+'</div><button class="btn primary" data-sign="'+p.id+'">獲得</button></div>'+
+    '</div>';
+  }).join("");
+  Array.prototype.forEach.call(document.querySelectorAll("[data-sign]"),function(b){
+    b.addEventListener("click",function(){signPlayer(b.getAttribute("data-sign"));});
+  });
+}
+function renderHistory(){
+  el("historyBody").innerHTML=state.history.length?state.history.slice().reverse().map(function(h){
+    return '<tr><td>'+h.year+'</td><td>'+h.w+'-'+h.l+'</td><td>'+h.rank+'位</td><td>'+h.post+'</td><td>'+(h.titles.length?h.titles.join(" / "):"—")+'</td><td>'+h.fans.toFixed(2)+'M</td><td>'+money(h.budget)+'</td></tr>';
+  }).join(""):'<tr><td colspan="7">まだ履歴がありません。</td></tr>';
+}
+function render(){
+  renderMetrics(); renderClub(); renderRoster(); renderMarket(); renderHistory();
+}
+function switchTab(name){
+  Array.prototype.forEach.call(document.querySelectorAll(".tab"),function(t){t.classList.add("hidden");});
+  Array.prototype.forEach.call(document.querySelectorAll(".nav button"),function(b){b.classList.toggle("active",b.getAttribute("data-tab")===name);});
+  el(name+"Tab").classList.remove("hidden");
+}
+
+Array.prototype.forEach.call(document.querySelectorAll(".nav button"),function(b){
+  b.addEventListener("click",function(){switchTab(b.getAttribute("data-tab"));});
+});
+el("simBtn").addEventListener("click",simulateSeason);
+el("offBtn").addEventListener("click",enterOffseason);
+el("nextBtn").addEventListener("click",nextSeason);
+el("refreshBtn").addEventListener("click",function(){
+  if(state.phase==="offseason"){generateMarket();state.log.unshift(state.year+" オフ: 市場を再スカウト。");render();}
+});
+
+render();
+})();
+</script>
+</body>
+</html>
