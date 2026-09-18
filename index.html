@@ -31,11 +31,33 @@ button{font:inherit;cursor:pointer}.btn{border:0;border-radius:11px;min-height:4
 .tablewrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:880px}th,td{padding:9px;border-bottom:1px solid var(--line);text-align:left;font-size:12px;white-space:nowrap}th{font-size:10px;color:var(--muted);background:#fafbfc}
 .name{font-weight:950;font-size:14px}.abilityline{font-size:11px;color:#4a5567;margin-top:3px;white-space:normal;line-height:1.45}
 .grade{font-weight:950}.gS{color:#7038ba}.gA{color:#d82c3a}.gB{color:#df7a1b}.gC{color:#b58a00}.gD{color:#2b8a4b}.gE{color:#2775a7}.gF{color:#66788d}.gG{color:#6f7379}
+
+.roster-sections{display:flex;flex-direction:column;gap:16px;padding:14px}
+.roster-section-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 8px;font-size:14px;font-weight:950;color:var(--navy)}
+.roster-section-title span{font-size:10px;color:var(--muted);font-weight:800}
+.player-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.player-tile{border:1px solid var(--line);border-radius:14px;background:#fbfcfd;padding:12px;min-width:0}
+.player-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.player-head-left{min-width:0}
+.player-head .name{font-size:15px;white-space:normal;overflow-wrap:anywhere}
+.player-meta{font-size:10px;color:var(--muted);margin-top:3px;line-height:1.45}
+.ability-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;margin-top:10px}
+.ability-box{border:1px solid var(--line);border-radius:9px;background:#fff;padding:6px 4px;text-align:center;min-width:0}
+.ability-box small{display:block;color:var(--muted);font-size:9px;line-height:1.2}
+.ability-box b{display:block;margin-top:2px;font-size:14px;line-height:1.2}
+.pitch-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin-top:8px}
+.pitch-box{border:1px solid var(--line);border-radius:9px;background:#fff;padding:6px 4px;text-align:center;min-width:0}
+.pitch-box small{display:block;font-size:12px;font-weight:950;color:var(--navy)}
+.pitch-box b{display:block;font-size:10px;margin-top:2px;white-space:normal;overflow-wrap:anywhere;line-height:1.25}
+.player-stats-season{margin-top:8px;padding-top:8px;border-top:1px dashed var(--line);font-size:10px;line-height:1.55;color:#25354a}
+.tile-actions{display:flex;align-items:center;gap:7px}
+.role-chip{font-size:10px;font-weight:950;padding:4px 7px;border-radius:999px;background:#e8edf3;color:#40526a;white-space:nowrap}
 .market{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.card{border:1px solid var(--line);border-radius:14px;padding:13px;background:#fbfcfd}.card.npb{background:#fffaf0;border-color:#e4bd58}.tag{font-size:10px;font-weight:950;padding:4px 7px;border-radius:999px;background:#e9edf2;color:#485466}.tag.npb{background:#f7dfa0;color:#6a4a00}.markettop{display:flex;justify-content:space-between;gap:10px}.market h3{margin:5px 0 0;font-size:16px}.contract{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);display:flex;align-items:flex-end;justify-content:space-between;gap:10px}.contract strong{font-size:14px}.scout{font-size:10px;color:var(--muted);margin-top:7px}
 .log{display:flex;flex-direction:column;gap:6px}.logitem{background:#fafbfc;border-left:3px solid var(--line);padding:7px 9px;font-size:12px}
 .hidden{display:none!important}
 @media(max-width:900px){.metrics{grid-template-columns:repeat(2,1fr)}.grid2{grid-template-columns:1fr}.market{grid-template-columns:1fr}}
-@media(max-width:520px){header{padding-bottom:58px}.metric strong{font-size:17px}.market{grid-template-columns:1fr}.actions{flex-direction:column}.actions .btn{width:100%}}
+@media(max-width:760px){.player-grid{grid-template-columns:1fr}.ability-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:520px){header{padding-bottom:58px}.metric strong{font-size:17px}.market{grid-template-columns:1fr}.actions{flex-direction:column}.actions .btn{width:100%}.pitch-grid{grid-template-columns:repeat(5,minmax(0,1fr));gap:4px}.pitch-box{padding:5px 2px}.pitch-box b{font-size:9px}}
 </style>
 </head>
 <body>
@@ -82,7 +104,7 @@ button{font:inherit;cursor:pointer}.btn{border:0;border-radius:11px;min-height:4
           <div class="notice">地区順位、ポストシーズン進出、World Series、MVP、Cy Young、Silver Sluggerなどでファン数が変動。そのファン数から翌年の球団予算を算出します。<br><br><b>成長タイプは年齢による能力変化の目安だけ。</b> 全盛期前でも現在能力が高ければ、その能力どおりに好成績・タイトル獲得が可能です。</div>
           <div style="margin-top:11px;font-size:12px;line-height:1.7">
             <b>現在戦力：</b><span id="teamStrength">—</span><br>
-            <b>26人枠：</b><span id="count26">26/26</span><br>
+            <b>26人枠：</b><span id="count26">26/26</span>（野手13 / 投手13）<br>
             <b>残り予算：</b><span id="roomText">—</span>
           </div>
         </div>
@@ -101,13 +123,11 @@ button{font:inherit;cursor:pointer}.btn{border:0;border-radius:11px;min-height:4
 
   <section id="rosterTab" class="tab hidden">
     <div class="panel">
-      <div class="phead"><div><h2>ロスター</h2><div class="sub">名前の下に全能力を表示</div></div><div class="sub" id="rosterCount"></div></div>
-      <div class="tablewrap">
-        <table>
-          <thead><tr><th>選手 / 能力</th><th>Pos</th><th>年齢</th><th>年俸</th><th>OVR</th><th></th></tr></thead>
-          <tbody id="rosterBody"></tbody>
-        </table>
+      <div class="phead">
+        <div><h2>ロスター</h2><div class="sub">26人枠：野手13人 / 投手13人</div></div>
+        <div class="sub" id="rosterCount"></div>
       </div>
+      <div id="rosterBody" class="roster-sections"></div>
     </div>
   </section>
 
@@ -157,7 +177,7 @@ var FIRST=["イーサン","ノア","ケイレブ","メイソン","ルーク","�
 var LAST=["マーサー","ヘイズ","ベネット","カーヴァー","ラムジー","フレッチャー","ドーソン","サットン","ホロウェイ","リード","ケラー","ビショップ","ダルトン","マドックス","ウォルシュ","パーカー","ハーラン","ヴォーン","クロフォード","エリス","ブルックス","ターナー","モラン"];
 var JPFIRST=["ハヤト","ユウマ","レン","ソウタ","アオイ","ミナト","ヤマト","カイト","レオ","タクマ","シュン","ケイ","ナオキ","イオリ"];
 var JPLAST=["ダテ","サエキ","タカハシ","フジワラ","クロダ","マエダ","カミヤ","シライシ","タチバナ","キリュウ","ミズノ","ナルセ","オオノ","ニシカワ"];
-var POS=["C","1B","2B","3B","SS","LF","CF","RF","DH","SP","SP","SP","SP","RP","RP","RP","CL"];
+var POS=["C","1B","2B","3B","SS","LF","CF","RF","DH","SP","SP","SP","SP","SP","RP","RP","RP","RP","RP","RP","RP","CL"];
 
 var DEV_TYPES=["早熟","弱早熟","普通","弱晩成","晩成","超晩成"];
 var DEV_PROFILE={
@@ -273,6 +293,36 @@ function abilityLine(p, scout){
     gspan(x.catch,"捕球")
   ].join("　");
 }
+
+function abilityBox(label,val){
+  var g=grade(val);
+  return '<div class="ability-box"><small>'+label+'</small><b class="grade g'+g+'">'+g+val+'</b></div>';
+}
+function hitterAbilityGrid(p){
+  return '<div class="ability-grid">'+
+    abilityBox("ミート",p.meet)+
+    abilityBox("パワー",p.power)+
+    abilityBox("走力",p.run)+
+    abilityBox("肩力",p.arm)+
+    abilityBox("守備力",p.field)+
+    abilityBox("捕球",p.catch)+
+  '</div>';
+}
+function pitcherAbilityGrid(p){
+  var x=p.pitching;
+  return '<div class="ability-grid" style="grid-template-columns:repeat(3,minmax(0,1fr))">'+
+    '<div class="ability-box"><small>球速</small><b>'+x.velocity+'km/h</b></div>'+
+    abilityBox("スタミナ",x.stamina)+
+    abilityBox("コントロール",x.control)+
+  '</div>';
+}
+function pitchArsenalGrid(p){
+  var x=p.pitching;
+  return '<div class="pitch-grid">'+PITCH_DIRS.map(function(d){
+    var q=x.pitches[d];
+    return '<div class="pitch-box"><small>'+d+'</small><b>'+(q?(q.name+' '+q.level):'—')+'</b></div>';
+  }).join("")+'</div>';
+}
 function performanceRating(p){
   var traitAvg=avg(Object.keys(p.traits||{}).map(function(k){return p.traits[k];}));
   var base=isPitcher(p)?pitcherOverall(p):ovr(p);
@@ -333,9 +383,30 @@ function makePlayer(pos,index,jp){
 function buildRoster(){
   var r=[];
   POS.forEach(function(pos,i){ r.push(makePlayer(pos,i,false)); });
-  ["C","2B","SS","3B","CF","RF","RP","RP","SP"].forEach(function(pos,i){
-    r.push(makePlayer(pos,20+i,false));
+  // 控え野手4人を追加して、野手13 / 投手13の26人枠にする
+  ["C","2B","SS","CF"].forEach(function(pos,i){
+    var bench=makePlayer(pos,30+i,false);
+    bench.rosterRole="bench";
+    r.push(bench);
   });
+
+  // 役割を明示
+  var spSeen=0, rpSeen=0;
+  r.forEach(function(p){
+    if(p.rosterRole==="bench")return;
+    if(isPitcher(p)){
+      if(p.pos==="SP"){
+        spSeen++;
+        p.rosterRole="rotation";
+      }else{
+        rpSeen++;
+        p.rosterRole="bullpen";
+      }
+    }else{
+      p.rosterRole="starter";
+    }
+  });
+
   state.roster=r.slice(0,26);
   var scale=139/payroll();
   state.roster.forEach(function(p){ p.salary=+Math.max(.8,p.salary*scale).toFixed(1); });
@@ -627,6 +698,7 @@ function signPlayer(id){
   if(room()<cost){ window.alert("予算不足です。初年度必要額 "+money(cost)+" / 残り "+money(Math.max(0,room()))); return; }
   var signed={
     id:p.id,name:p.name,origin:p.origin,pos:p.pos,age:p.age,devType:p.devType,
+    rosterRole:isPitcher(p)?(p.pos==="SP"?"rotation":"bullpen"):"bench",
     meet:p.meet,power:p.power,run:p.run,arm:p.arm,field:p.field,catch:p.catch,
     pitching:p.pitching?{
       velocity:p.pitching.velocity,stamina:p.pitching.stamina,control:p.pitching.control,
@@ -696,23 +768,62 @@ function renderCyYoungRace(){
       '</div>';
   }).join("");
 }
+function rosterTile(p){
+  var shownOvr=isPitcher(p)?pitcherOverall(p):ovr(p);
+  var roleLabel=p.rosterRole==="starter"?"スタメン":p.rosterRole==="bench"?"控え":p.rosterRole==="rotation"?"先発":p.rosterRole==="bullpen"?"ブルペン":"";
+  var abilities=isPitcher(p)?pitcherAbilityGrid(p):hitterAbilityGrid(p);
+  var extra=isPitcher(p)?pitchArsenalGrid(p):('<div class="abilityline" style="font-size:10px;margin-top:7px">'+traitLine(p)+'</div>');
+  var stats=isPitcher(p)?pitcherStatsLine(p):"";
+  return '<div class="player-tile">'+
+    '<div class="player-head">'+
+      '<div class="player-head-left">'+
+        '<div class="name">'+p.name+'</div>'+
+        '<div class="player-meta">'+p.pos+' / '+p.age+'歳 / '+p.origin+' / 成長 '+p.devType+'（'+DEV_PROFILE[p.devType].label+'）</div>'+
+      '</div>'+
+      '<div class="tile-actions"><span class="role-chip">'+roleLabel+'</span><b>OVR '+shownOvr+'</b></div>'+
+    '</div>'+
+    abilities+
+    extra+
+    (stats?'<div class="player-stats-season">'+stats+'</div>':'')+
+    '<div class="player-meta" style="margin-top:8px">年俸 '+money(p.salary)+' / 契約残 '+p.years+'年</div>'+
+    '<button class="btn danger" style="width:100%;min-height:36px;margin-top:9px;font-size:11px" data-release="'+p.id+'">放出</button>'+
+  '</div>';
+}
 function renderRoster(){
   el("rosterCount").textContent=state.roster.length+"/26";
-  var body=el("rosterBody");
-  body.innerHTML=state.roster.slice().sort(function(a,b){return performanceRating(b)-performanceRating(a);}).map(function(p){
-    var mainLine=isPitcher(p)?pitcherLine(p):abilityLine(p);
-    var secondLine=isPitcher(p)?pitchLine(p):traitLine(p);
-    var shownOvr=isPitcher(p)?pitcherOverall(p):ovr(p);
-    var statsLine=isPitcher(p)?pitcherStatsLine(p):"";
-    return '<tr>'+
-      '<td><div class="name">'+p.name+'</div><div class="abilityline">'+mainLine+'</div>'+
-      '<div class="abilityline" style="font-size:10px">'+secondLine+'</div>'+
-      (statsLine?'<div class="abilityline" style="margin-top:5px;color:#17263d">'+statsLine+'</div>':'')+
-      '<div class="sub">'+p.origin+' / 成長 '+p.devType+'（目安 '+DEV_PROFILE[p.devType].label+'） / 契約残 '+p.years+'年</div></td>'+
-      '<td>'+p.pos+'</td><td>'+p.age+'</td><td>'+money(p.salary)+'</td><td><b>'+shownOvr+'</b></td>'+
-      '<td><button class="btn danger" style="min-height:34px;padding:0 10px;font-size:11px" data-release="'+p.id+'">放出</button></td>'+
-    '</tr>';
-  }).join("");
+
+  var starters=state.roster.filter(function(p){return p.rosterRole==="starter";});
+  var bench=state.roster.filter(function(p){return p.rosterRole==="bench";});
+  var rotation=state.roster.filter(function(p){return p.rosterRole==="rotation";});
+  var bullpen=state.roster.filter(function(p){return p.rosterRole==="bullpen";});
+
+  // 古いデータやFA加入でroleが無い場合も表示から消えないよう補完
+  state.roster.forEach(function(p){
+    if(p.rosterRole)return;
+    if(isPitcher(p)){
+      p.rosterRole=p.pos==="SP"?"rotation":"bullpen";
+    }else{
+      p.rosterRole=starters.length<9?"starter":"bench";
+    }
+  });
+  starters=state.roster.filter(function(p){return p.rosterRole==="starter";});
+  bench=state.roster.filter(function(p){return p.rosterRole==="bench";});
+  rotation=state.roster.filter(function(p){return p.rosterRole==="rotation";});
+  bullpen=state.roster.filter(function(p){return p.rosterRole==="bullpen";});
+
+  function section(title,arr,note){
+    return '<section>'+
+      '<div class="roster-section-title">'+title+'<span>'+note+'　'+arr.length+'人</span></div>'+
+      '<div class="player-grid">'+arr.slice().sort(function(a,b){return performanceRating(b)-performanceRating(a);}).map(rosterTile).join("")+'</div>'+
+    '</section>';
+  }
+
+  el("rosterBody").innerHTML=
+    section("スタメン野手",starters,"基本9人")+
+    section("控え野手",bench,"ベンチ4人")+
+    section("先発ローテーション",rotation,"5人")+
+    section("ブルペン",bullpen,"8人");
+
   Array.prototype.forEach.call(document.querySelectorAll("[data-release]"),function(b){
     b.addEventListener("click",function(){releasePlayer(b.getAttribute("data-release"));});
   });
